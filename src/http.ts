@@ -1,31 +1,56 @@
 import { Context, Adapter } from 'koishi'
 import InfoflowBot from './bot'
 import {} from '@koishijs/plugin-server'
-import crypto from 'crypto-js'
+import CryptoJS from 'crypto-js'
 
 export class HttpServer<C extends Context = Context> extends Adapter<C, InfoflowBot<C>> {
   static inject = ['server']
+  cipher: AESCipher
   constructor(ctx: C, bot: InfoflowBot<C>) {
     super(ctx)
   }
 
   connect(bot: InfoflowBot){
-    const { path } = bot.config
+    const { path, EncodingAESKey } = bot.config
+    this.cipher = new AESCipher(EncodingAESKey)
     bot.ctx.server.post(path, (ctx) => {
       const body = ctx.request.body
-      console.log(btoa(body))
+      const res =  JSON.parse(this.cipher.decrypt(body))
+      console.log(res.message.body)
+      
     })
     return Promise.resolve()
   }
 
 }
 
-function btoa(str: string) { return Buffer.from(str).toString('utf-8') }
-
-function aesDecrypt(encrypted, key) {
-  const decipher = crypto.createDecipheriv('aes-128-ccm', key, '1234567890123456', 10);
-  var decrypted = decipher.update(encrypted, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
+class AESCipher {
+  key: CryptoJS.lib.WordArray;
+  options: any;
+  constructor(key: string) {
+    this.key = CryptoJS.enc.Base64.parse(key);
+    this.options = {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7
+    };
+  }
+  // 加密
+  encrypt(data) {
+    const cipher = CryptoJS.AES.encrypt(data, this.key, this.options);
+    const base64Cipher = cipher.ciphertext.toString(CryptoJS.enc.Base64);
+    const resultCipher = base64Cipher
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/g, '');
+    return resultCipher;
+  }
+  // 解密
+  decrypt(content) {
+    content = content
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(content.length + content.length % 4, '=')
+    const bytes = CryptoJS.AES.decrypt(content, this.key, this.options);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  }
 }
-

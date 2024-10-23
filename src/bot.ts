@@ -7,10 +7,6 @@ export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot
     super(ctx, config, 'infoflow')
     ctx.plugin(HttpServer, this);
   }
-
-  // async start(){
-  //   console.log('start')
-  // }
 }
 
 export namespace InfoflowBot {
