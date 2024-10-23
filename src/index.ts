@@ -1,11 +1,5 @@
-import { Context, Schema } from 'koishi'
+import { InfoflowBot } from './bot';
 
-export const name = 'infoflow-adapter'
+export * from './bot';
 
-export interface Config {}
-
-export const Config: Schema<Config> = Schema.object({})
-
-export function apply(ctx: Context) {
-  // write your plugin here
-}
+export default InfoflowBot;
