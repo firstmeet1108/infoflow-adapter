@@ -12,6 +12,7 @@ export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot
 export namespace InfoflowBot {
   export interface Config {
     name: string;
+    robotId: string;
     targetUrl: string;
     selfUrl?: string;
     port?: number;
@@ -23,6 +24,7 @@ export namespace InfoflowBot {
   export const Config: Schema<Config> = Schema.object({
     targetUrl: Schema.string().description('目标 URL'),
     name: Schema.string().description('机器人名称'),
+    robotId: Schema.string().description('机器人 ID'),
     selfUrl: Schema.string().default('localhost').description('机器人 URL'),
     port: Schema.number().default(80).description('端口号'),
     token: Schema.string().description('安全令牌'),

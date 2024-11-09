@@ -1,7 +1,7 @@
 import { Context, Adapter } from 'koishi'
 import InfoflowBot from './bot'
 import {} from '@koishijs/plugin-server'
-import { AESCipher, getParam, getSignature } from './utils'
+import { AESCipher, getParam, getSignature, adaptSession } from './utils'
 
 export class HttpServer<C extends Context = Context> extends Adapter<C, InfoflowBot<C>> {
   static inject = ['server']
@@ -10,14 +10,14 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, Infoflow
     super(ctx)
   }
 
-  connect(bot: InfoflowBot){
+  async connect(bot: InfoflowBot){
     const { path, EncodingAESKey } = bot.config
     this.cipher = new AESCipher(EncodingAESKey)
-    bot.ctx.server.post(path, (ctx) => {
-      const body = ctx.request.body
+    bot.ctx.server.post(path, async (ctx) => {
+      const reqBody = ctx.request.body
       // 验证
-      if(body.echostr){
-        if(getSignature(body.rn, body.timestamp, bot.config.token) === body.signature) ctx.body = body.echostr
+      if(reqBody.echostr){
+        if(getSignature(reqBody.rn, reqBody.timestamp, bot.config.token) === reqBody.signature) ctx.body = reqBody.echostr
         else throw new Error('签名错误')
         return
       }
@@ -28,8 +28,17 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, Infoflow
         ctx.status = 403
         return
       }
-      const res =  JSON.parse(this.cipher.decrypt(body))
+      const res = this.cipher.decrypt(reqBody)
+      const { message: { body } } = res
+      const { robotid } = body.find((item) => {
+        return '' + item?.robotid === bot.config.robotId
+      })
+      if(!robotid) return
+      const theBot = this.bots.find((item) => item.config.robotId === '' + robotid)
+      const session = adaptSession(theBot, body)
+      console.log(session)
+      theBot.dispatch(session)
     })
-    return Promise.resolve()
+    bot.online()
   }
 }
