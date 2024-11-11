@@ -33,12 +33,7 @@ export class AESCipher {
   }
 }
 
-export function getParam(url: string): {
-  signature?: string;
-  rn?: string;
-  timestamp?: string;
-  echostr?: string;
-} {
+export function getParam(url: string): any {
   const search = url.split('?')[1];
   if (!search) return {};
   return search.split('&').reduce((pre, curr) => {

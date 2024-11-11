@@ -1,10 +1,20 @@
-import { Context, Schema, Bot } from 'koishi'
+import { Context, Schema, Bot, HTTP } from 'koishi'
+import { Internal } from './type';
 import { HttpServer } from './http';
+import { getParam } from './utils'
 export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot.Config> {
   static inject = ['server', 'http'];
-
+  http: HTTP
+  internal: Internal
   constructor(ctx: C, config: InfoflowBot.Config) {
     super(ctx, config, 'infoflow')
+    const { access_token } = getParam(config.targetUrl) as { access_token: string }
+
+    this.http = ctx.http.extend({
+      endpoint: 'http://apiin.im.baidu.com/api/',
+    })
+    this.internal = new Internal(this)
+
     ctx.plugin(HttpServer, this);
   }
 }

@@ -2,12 +2,17 @@ import { Context, Adapter } from 'koishi'
 import InfoflowBot from './bot'
 import {} from '@koishijs/plugin-server'
 import { AESCipher, getParam, getSignature, adaptSession } from './utils'
+import { requestUrlParam } from './type'
 
 export class HttpServer<C extends Context = Context> extends Adapter<C, InfoflowBot<C>> {
   static inject = ['server']
   cipher: AESCipher
   constructor(ctx: C, bot: InfoflowBot<C>) {
     super(ctx)
+  }
+  fork(ctx: C, bot: InfoflowBot<C>) {
+    super.fork(ctx, bot)
+    return bot.online()
   }
 
   async connect(bot: InfoflowBot){
@@ -22,7 +27,7 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, Infoflow
         return
       }
 
-      const param = getParam(ctx.request.url)
+      const param = getParam(ctx.request.url) as requestUrlParam
       if(!param.signature || !param.timestamp || !param.rn || getSignature(param.rn, param.timestamp, bot.config.token) !== param.signature){
         ctx.body = 'fail'
         ctx.status = 403
@@ -35,10 +40,9 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, Infoflow
       })
       if(!robotid) return
       const theBot = this.bots.find((item) => item.config.robotId === '' + robotid)
+      console.log('this.bots', this.bots)
       const session = adaptSession(theBot, body)
-      console.log(session)
       theBot.dispatch(session)
     })
-    bot.online()
   }
 }
