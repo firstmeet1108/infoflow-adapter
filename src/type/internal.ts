@@ -13,7 +13,10 @@ export interface BaseResponse {
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 export class Internal {
-  constructor(private bot: InfoflowBot) {}
+  private defaultParam: Dict
+  constructor(private bot: InfoflowBot, defaultParam?: Dict) {
+    this.defaultParam = defaultParam
+  }
 
   private processReponse(response: any): BaseResponse {
     const { code, msg } = response
@@ -37,6 +40,8 @@ export class Internal {
               return args.shift()
             })
             const config: HTTP.RequestConfig = {}
+            Object.assign(config.params, this.defaultParam)
+            console.log(config)
             if (args.length === 1) {
               if (method === 'GET' || method === 'DELETE') {
                 config.params = args[0]

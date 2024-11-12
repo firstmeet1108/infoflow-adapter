@@ -1,49 +1,7 @@
 import { Internal } from "./internal";
 
-export interface MessageRequest {
-  eventtype: string;
-  agentid: number;
-  groupid: number;
-  corpid: string;
-  time: number;
-  fromid: number;
-  opencode: string;
-  message: Message;
-}
-
-export interface Message{
-  header: {
-    fromuserid: string;
-    toid: number,
-    totype: string;
-    msgtype: string;
-    clientmsgid: number;
-    messageid: number;
-    msgseqid: string;
-    at: object;
-    compatible: string;
-    offlinenotify: string;
-    extra: string;
-    servertime: number;
-    clientime: number;
-    updatetime: number;
-  }
-  body: Array<BodyItem>;
-}
-
-export interface BodyItem {
-  type: 'LINK' | 'TEXT' | 'AT' | 'IMAGE' | 'command';
-  robotid?: number;
-  name?: string;
-  content?: string;
-  downloadurl?: string;
-  userid?: string;
-  label?: string;
-  commandname?: string;
-}
-
 Internal.define({
-  'msg/groupmsgsend': {
+  '/msg/groupmsgsend': {
     POST: 'sendGroupMessage'
   }
 })
@@ -57,3 +15,22 @@ declare module './internal' {
     sendGroupMessage(query?: any)
   }
 }
+
+// {
+//   "agentid": 736,
+//   "message": {
+//       "header": {
+//           "toid": 10526339,
+//           "totype": "GROUP",
+//           "msgtype": "TEXT",
+//           "clientmsgid": 1569398477300,
+//           "role": "robot"
+//       },
+//       "body": [
+//           {
+//               "type": "TEXT",
+//               "content": "Hi~"
+//           }
+//       ]
+//   }
+// }

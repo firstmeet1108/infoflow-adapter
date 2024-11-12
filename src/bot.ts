@@ -13,9 +13,18 @@ export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot
     this.http = ctx.http.extend({
       endpoint: 'http://apiin.im.baidu.com/api/',
     })
-    this.internal = new Internal(this)
+    this.internal = new Internal(this, {
+      access_token
+    })
 
     ctx.plugin(HttpServer, this);
+  }
+
+  initialize(){
+    Promise.resolve().then(e => {
+      this.user.name = this.config.name
+      this.online()
+    })
   }
 }
 
