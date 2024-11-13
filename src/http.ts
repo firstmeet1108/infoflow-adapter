@@ -12,14 +12,14 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, Infoflow
   }
   fork(ctx: C, bot: InfoflowBot<C>) {
     super.fork(ctx, bot)
-    return bot.initialize()
+    const { EncodingAESKey } = bot.config
+    this.cipher = new AESCipher(EncodingAESKey)
+    // return bot.initialize()
   }
 
   async connect(bot: InfoflowBot){
-    const { path, EncodingAESKey } = bot.config
-    this.cipher = new AESCipher(EncodingAESKey)
-    bot.ctx.server.post(path, async (ctx) => {
-      console.log(123)
+    const { path } = bot.config
+    bot.ctx.server.post(path, (ctx) => {
       const reqBody = ctx.request.body
       // 验证
       if(reqBody.echostr){

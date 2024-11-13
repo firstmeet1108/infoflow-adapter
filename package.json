@@ -15,7 +15,7 @@
     "plugin"
   ],
   "peerDependencies": {
-    "koishi": "^4.17.11"
+    "koishi": "^4.18.1"
   },
   "dependencies": {
     "crypto-js": "^4.2.0"
