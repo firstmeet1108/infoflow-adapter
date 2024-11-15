@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 import { Context, h } from 'koishi';
 import InfoflowBot from './bot';
-import { MessageRequest, BodyItem } from './type';
+import { MessageRequest, ReceiveMessage, m } from './type';
 export class AESCipher {
   key: CryptoJS.lib.WordArray;
   options: any;
@@ -48,15 +48,21 @@ export function getSignature(rn: string, timestamp: string, token: string) {
     .toString()
 }
 
-export function adaptSession<c extends Context>(bot: InfoflowBot<c>, body: Array<BodyItem>) {
+export function getSession<c extends Context>(bot: InfoflowBot<c>, message: ReceiveMessage) {
   const session = bot.session();
+  const { body, header } = message
   session.setInternal('infoflow', body);
   session.type = 'message'
-  session.elements = body.map(adaptMessage);
+  session.elements = body.map(m2h);
+  session.channelId = header.toid.toString()
+  session.userId = header.fromuserid
+  session.messageId = header.clientmsgid.toString()
+  session.timestamp = header.servertime
+  session.guildId = header.toid.toString()
   return session
 }
 
-function adaptMessage(item: BodyItem): h | null {
+function m2h(item: m): h | null {
   switch(item.type){
     case 'AT':
       if(item.robotid) return null
@@ -70,4 +76,29 @@ function adaptMessage(item: BodyItem): h | null {
     case 'TEXT':
       return h.text(item.content)
   }
+}
+
+function h2m(item: h): m {
+  switch(item.type){
+    case 'at':
+      return {
+        type: 'AT',
+        userid: item.data.id,
+        name: item.data.name
+      }
+    case 'image':
+      return {
+        type: 'IMAGE',
+        downloadurl: item.data.url
+      }
+    default:
+      return {
+        type: 'TEXT',
+        content: item.text
+      }
+  }
+}
+
+export function getBase64(data) {
+  return btoa(new Uint8Array(data).reduce((data, byte) => data + String.fromCharCode(byte), ''))
 }

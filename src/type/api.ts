@@ -16,21 +16,4 @@ declare module './internal' {
   }
 }
 
-// {
-//   "agentid": 736,
-//   "message": {
-//       "header": {
-//           "toid": 10526339,
-//           "totype": "GROUP",
-//           "msgtype": "TEXT",
-//           "clientmsgid": 1569398477300,
-//           "role": "robot"
-//       },
-//       "body": [
-//           {
-//               "type": "TEXT",
-//               "content": "Hi~"
-//           }
-//       ]
-//   }
-// }
+

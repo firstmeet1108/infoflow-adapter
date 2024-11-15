@@ -1,7 +1,8 @@
-import { Context, Schema, Bot, HTTP } from 'koishi'
+import { Context, Schema, Bot, HTTP, Fragment, h } from 'koishi'
 import { Internal } from './type';
 import { HttpServer } from './http';
 import { getParam } from './utils'
+import { SendOptions } from '@satorijs/protocol';
 export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot.Config> {
   static inject = ['server', 'http'];
   http: HTTP
@@ -26,6 +27,11 @@ export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot
       this.online()
     })
   }
+
+  // sendMessage(channelId: string, content: Fragment, guildId?: string, options?: SendOptions): Promise<string[]> {
+  //   console.log(channelId, content)
+  //   // return this.internal.sendGroupMessage()
+  // }
 }
 
 export namespace InfoflowBot {

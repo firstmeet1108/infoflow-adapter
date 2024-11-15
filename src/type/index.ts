@@ -16,10 +16,43 @@ export interface MessageRequest {
   time: number;
   fromid: number;
   opencode: string;
-  message: Message;
+  message: ReceiveMessage;
 }
 
-export interface Message{
+export type mText = {
+  type: 'TEXT';
+  content: string;
+}
+
+type mLink = {
+  type: 'LINK';
+  href: string;
+  label?: string;
+}
+
+type mAtall = {
+  type: 'AT';
+  atall: boolean;
+}
+
+type mAt = {
+  type: 'AT';
+  atuserids: Array<string>;
+}
+
+type mImage = {
+  type: 'IMAGE';
+  content: string;
+}
+
+type mMd = {
+  type: 'MD';
+  content: string;
+}
+
+export type m = mText | mLink | mAtall | mAt | mImage | mMd
+
+export interface ReceiveMessage{
   header: {
     fromuserid: string;
     toid: number,
@@ -36,16 +69,45 @@ export interface Message{
     clientime: number;
     updatetime: number;
   }
-  body: Array<BodyItem>;
+  body: Array<m>;
 }
 
-export interface BodyItem {
-  type: 'LINK' | 'TEXT' | 'AT' | 'IMAGE' | 'command';
-  robotid?: number;
-  name?: string;
-  content?: string;
-  downloadurl?: string;
-  userid?: string;
-  label?: string;
-  commandname?: string;
+// export interface m {
+//   type: mType;
+//   robotid?: number;
+//   name?: string;
+//   content?: string;
+//   downloadurl?: string;
+//   userid?: string;
+//   label?: string;
+//   commandname?: string;
+//   atall?: boolean;
+// }
+
+
+export interface SendMessage {
+  message: {
+    header: {
+      toid: number | Array<number>;
+    };
+    body: Array<m>;
+  };
 }
+
+// {
+//   "message": {
+//       "header": {
+//           "toid": 10526339,
+//           "totype": "GROUP",
+//           "msgtype": "TEXT",
+//           "clientmsgid": 1569398477300,
+//           "role": "robot"
+//       },
+//       "body": [
+//           {
+//               "type": "TEXT",
+//               "content": "Hi~"
+//           }
+//       ]
+//   }
+// }
