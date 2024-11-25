@@ -2,7 +2,7 @@ import { Context, Adapter } from 'koishi'
 import InfoflowBot from './bot'
 import {} from '@koishijs/plugin-server'
 import { AESCipher, getParam, getSignature, getSession } from './utils'
-import { requestUrlParam } from './type'
+import { requestUrlParam, rAt } from './type'
 
 export class HttpServer<C extends Context = Context> extends Adapter<C, InfoflowBot<C>> {
   static inject = ['server']
@@ -37,8 +37,9 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, Infoflow
       const res = this.cipher.decrypt(reqBody)
       const { message } = res
       const { robotid } = message.body.find((item) => {
-        return '' + item?.robotid === bot.config.robotId
-      })
+        if(item.type === 'AT')
+          return '' + item?.robotid === bot.config.robotId
+      }) as rAt
       if(!robotid) return
       const theBot = this.bots.find((item) => item.config.robotId === '' + robotid)
       const session = getSession(theBot, message)

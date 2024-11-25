@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 import { Context, h } from 'koishi';
 import InfoflowBot from './bot';
-import { MessageRequest, ReceiveMessage, m } from './type';
+import { MessageRequest, ReceiveMessage, r } from './type';
 export class AESCipher {
   key: CryptoJS.lib.WordArray;
   options: any;
@@ -62,7 +62,7 @@ export function getSession<c extends Context>(bot: InfoflowBot<c>, message: Rece
   return session
 }
 
-function m2h(item: m): h | null {
+function m2h(item: r): h | null {
   switch(item.type){
     case 'AT':
       if(item.robotid) return null
@@ -78,26 +78,26 @@ function m2h(item: m): h | null {
   }
 }
 
-function h2m(item: h): m {
-  switch(item.type){
-    case 'at':
-      return {
-        type: 'AT',
-        userid: item.data.id,
-        name: item.data.name
-      }
-    case 'image':
-      return {
-        type: 'IMAGE',
-        downloadurl: item.data.url
-      }
-    default:
-      return {
-        type: 'TEXT',
-        content: item.text
-      }
-  }
-}
+// function h2m(item: h): m {
+//   switch(item.type){
+//     case 'at':
+//       return {
+//         type: 'AT',
+//         userid: item.data.id,
+//         name: item.data.name
+//       }
+//     case 'image':
+//       return {
+//         type: 'IMAGE',
+//         downloadurl: item.data.url
+//       }
+//     default:
+//       return {
+//         type: 'TEXT',
+//         content: item.text
+//       }
+//   }
+// }
 
 export function getBase64(data) {
   return btoa(new Uint8Array(data).reduce((data, byte) => data + String.fromCharCode(byte), ''))

@@ -19,38 +19,54 @@ export interface MessageRequest {
   message: ReceiveMessage;
 }
 
-export type mText = {
+export type Text = {
   type: 'TEXT';
   content: string;
 }
 
-type mLink = {
+export type Link = {
   type: 'LINK';
   href: string;
   label?: string;
 }
 
-type mAtall = {
+export type rAt = {
   type: 'AT';
-  atall: boolean;
+  name: string;
+  robotid?: number;
+  userid?: string;
 }
 
-type mAt = {
+export type sAt = {
   type: 'AT';
-  atuserids: Array<string>;
+  atuserids?: Array<string>;
+  robotid?: number;
+  atall?: boolean;
+};
+
+export type rImage = {
+  type: 'IMAGE';
+  downloadurl: string;
 }
 
-type mImage = {
+export type sImage = {
   type: 'IMAGE';
   content: string;
 }
 
-type mMd = {
+export type Md = {
   type: 'MD';
   content: string;
 }
 
-export type m = mText | mLink | mAtall | mAt | mImage | mMd
+export type Command = {
+  type: 'command';
+  commandname: string;
+}
+
+export type r = Text | Link | rImage | Md | Command | rAt
+
+export type s = Text | Link | sImage | Md | Command | sAt
 
 export interface ReceiveMessage{
   header: {
@@ -69,20 +85,8 @@ export interface ReceiveMessage{
     clientime: number;
     updatetime: number;
   }
-  body: Array<m>;
+  body: Array<r>;
 }
-
-// export interface m {
-//   type: mType;
-//   robotid?: number;
-//   name?: string;
-//   content?: string;
-//   downloadurl?: string;
-//   userid?: string;
-//   label?: string;
-//   commandname?: string;
-//   atall?: boolean;
-// }
 
 
 export interface SendMessage {
@@ -90,7 +94,7 @@ export interface SendMessage {
     header: {
       toid: number | Array<number>;
     };
-    body: Array<m>;
+    body: Array<s>;
   };
 }
 

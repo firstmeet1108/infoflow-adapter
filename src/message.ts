@@ -1,6 +1,6 @@
 import { Context, Element, MessageEncoder } from "koishi";
 import InfoflowBot from "./bot";
-import { SendMessage, mText } from "./type";
+import { SendMessage, Text } from "./type";
 import { getBase64 } from './utils';
 
 export class InfoflowMessageEncoder<C extends Context = Context> extends MessageEncoder<C, InfoflowBot<C>> {
@@ -8,7 +8,7 @@ export class InfoflowMessageEncoder<C extends Context = Context> extends Message
   private body: SendMessage['message']['body']
   async prepare() {
     this.header = {
-      toid: +this.channelId,
+      toid: [+this.channelId],
     }
     this.body = []
   }
@@ -38,13 +38,13 @@ export class InfoflowMessageEncoder<C extends Context = Context> extends Message
         label: attrs.children ? attrs.children.toString() : attrs.href,
       })
     } else if (type === 'p') {
-      if(!(this.body[this.body.length - 1].type === 'TEXT' && (this.body[this.body.length - 1] as mText).content.endsWith('\n')))
+      if(!(this.body[this.body.length - 1].type === 'TEXT' && (this.body[this.body.length - 1] as Text).content.endsWith('\n')))
         this.body.push({
           type: 'TEXT',
           content: '\n',
         })
       await this.render(children)
-      if(!(this.body[this.body.length - 1].type === 'TEXT' && (this.body[this.body.length - 1] as mText).content.endsWith('\n')))
+      if(!(this.body[this.body.length - 1].type === 'TEXT' && (this.body[this.body.length - 1] as Text).content.endsWith('\n')))
         this.body.push({
           type: 'TEXT',
           content: '\n',
@@ -66,14 +66,35 @@ export class InfoflowMessageEncoder<C extends Context = Context> extends Message
         content: encodeImage,
       })
     } else if (['video', 'audio', 'file'].includes(type)) {
+      // platform does not support video, audio and file
     } else if (type === 'figure' || type === 'message') {
+      await this.render(children)
     } else if (type === 'hr') {
+      // platform does not support hr
     } else if (type === 'form') {
+      // platform does not support form
     } else if (type === 'input') {
+      // platform does not support input
     } else if (type === 'button') {
+      // platform does not support button
     } else if (type === 'button-group') {
+      // platform does not support button-group
     } else {
       await this.render(children)
     }
+  }
+
+  async flush() {
+    await this.post()
+    this.body = []
+  }
+
+  async post(){
+    this.bot.internal.sendGroupMessage({
+      message: {
+        header: this.header,
+        body: this.body,
+      },
+    })
   }
 }

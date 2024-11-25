@@ -3,10 +3,13 @@ import { Internal } from './type';
 import { HttpServer } from './http';
 import { getParam } from './utils'
 import { SendOptions } from '@satorijs/protocol';
+import { InfoflowMessageEncoder } from './message';
 export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot.Config> {
   static inject = ['server', 'http'];
+  static MessageEncoder = InfoflowMessageEncoder;
   http: HTTP
   internal: Internal
+
   constructor(ctx: C, config: InfoflowBot.Config) {
     super(ctx, config, 'infoflow')
     const { access_token } = getParam(config.targetUrl) as { access_token: string }
@@ -15,7 +18,9 @@ export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot
       endpoint: 'http://apiin.im.baidu.com/api/',
     })
     this.internal = new Internal(this, {
-      access_token
+      query:{
+        access_token
+      }
     })
 
     ctx.plugin(HttpServer, this);

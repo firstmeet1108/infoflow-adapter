@@ -13,18 +13,17 @@ export interface BaseResponse {
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 export class Internal {
-  private defaultParam: Dict
-  constructor(private bot: InfoflowBot, defaultParam?: Dict) {
-    this.defaultParam = defaultParam
-  }
+  // private defaultParam: Dict
+  constructor(private bot: InfoflowBot, private defaultParam?: Dict) {}
 
   private processReponse(response: any): BaseResponse {
-    const { code, msg } = response
-    if (code === 0) {
+    const { data: { fail } } = response
+    const errs = Object.values(fail)
+    if (errs.length === 0) {
       return response
     } else {
       this.bot.logger.debug('response: %o', response)
-      throw new Error(`HTTP response with non-zero status (${code}) with message "${msg}"`)
+      throw new Error(`HTTP response with non-zero status (${errs[0]})`)
     }
   }
 
@@ -35,13 +34,17 @@ export class Internal {
         for (const name of makeArray(routes[path][method])) {
           Internal.prototype[name] = async function (this: Internal, ...args: any[]) {
             const raw = args.join(', ')
-            const url = path.replace(/\{([^}]+)\}/g, () => {
+            let url = path.replace(/\{([^}]+)\}/g, () => {
               if (!args.length) throw new Error(`too few arguments for ${path}, received ${raw}`)
               return args.shift()
             })
+            if(this.defaultParam.query) {
+              url+= '?'
+              for(let i in this.defaultParam.query) {
+                url = url + `${i}=${this.defaultParam.query[i]}`
+              }
+            }
             const config: HTTP.RequestConfig = {}
-            Object.assign(config.params, this.defaultParam)
-            console.log(config)
             if (args.length === 1) {
               if (method === 'GET' || method === 'DELETE') {
                 config.params = args[0]
