@@ -1,12 +1,13 @@
 {
   "name": "koishi-plugin-infoflow-adapter",
   "description": "如流适配器",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "contributors": [
     "firstmeet <2022742378@qq.com>"
   ],
+  "homepage": "https://github.com/firstmeet1108/infoflow-adapter",
   "files": [
     "lib",
     "dist"
