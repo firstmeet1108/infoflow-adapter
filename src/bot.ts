@@ -29,6 +29,7 @@ export class InfoflowBot<C extends Context = Context> extends Bot<C, InfoflowBot
   initialize(){
     Promise.resolve().then(e => {
       this.user.name = this.config.name
+      this.user.avatar = '' // 如流暂未支持获取机器人信息
       this.online()
     })
   }
